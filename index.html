@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Secret Unc</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="smoke-bg"></div>
+
+  <div class="container">
+    <div class="landing-hero">
+      <h1 class="glow-pulse">Secret Unc</h1>
+      <p class="tagline">Someone at this table isn't who they claim to be.</p>
+
+      <div class="landing-options">
+        <!-- HOST OPTION -->
+        <div class="landing-option">
+          <div class="card gold-border" style="text-align:center;">
+            <h3 style="color:var(--gold); margin-bottom:0.5rem; font-size:0.85rem;">Host a Game</h3>
+            <p class="text-muted text-sm mb-2" style="font-style:italic;">
+              Display this on the big screen
+            </p>
+            <button class="btn btn-large" id="btn-create" onclick="createRoom()">
+              Open Case File
+            </button>
+          </div>
+        </div>
+
+        <!-- JOIN OPTION -->
+        <div class="landing-option">
+          <div class="card gold-border" style="text-align:center;">
+            <h3 style="color:var(--gold); margin-bottom:0.5rem; font-size:0.85rem;">Join a Game</h3>
+            <p class="text-muted text-sm mb-2" style="font-style:italic;">
+              Play from your phone
+            </p>
+            <div style="margin-bottom:0.75rem;">
+              <label>Case File Code</label>
+              <input type="text" id="input-code" placeholder="XXXX" maxlength="4"
+                     style="text-align:center; font-size:1.5rem; letter-spacing:0.3em; text-transform:uppercase;">
+            </div>
+            <div style="margin-bottom:1rem;">
+              <label>Your Alias</label>
+              <input type="text" id="input-name" placeholder="Enter a name..." maxlength="16">
+            </div>
+            <button class="btn btn-large" id="btn-join" onclick="joinRoom()">
+              Enter Investigation
+            </button>
+            <p id="join-error" class="text-crimson text-sm mt-1" style="display:none;"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Auto-uppercase the code input
+    document.getElementById('input-code').addEventListener('input', function() {
+      this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    });
+
+    // Enter key support
+    document.getElementById('input-name').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') joinRoom();
+    });
+    document.getElementById('input-code').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('input-name').focus();
+    });
+
+    function createRoom() {
+      window.location.href = '/host.html';
+    }
+
+    function joinRoom() {
+      const code = document.getElementById('input-code').value.trim();
+      const name = document.getElementById('input-name').value.trim();
+      const errorEl = document.getElementById('join-error');
+
+      if (!code || code.length < 4) {
+        errorEl.textContent = 'Enter a 4-character case file code.';
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (!name || name.length < 1) {
+        errorEl.textContent = 'Enter your alias.';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      sessionStorage.setItem('joinCode', code);
+      sessionStorage.setItem('joinName', name);
+      window.location.href = '/player.html';
+    }
+  </script>
+</body>
+</html>

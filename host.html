@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secret Unc — Case Room</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .answer-card { animation-delay: calc(var(--i, 0) * 0.15s); }
+  </style>
+</head>
+<body>
+  <div class="smoke-bg"></div>
+
+  <div class="host-screen">
+    <!-- HEADER -->
+    <div class="header-bar">
+      <div class="logo">Secret Unc</div>
+      <div class="round-info" id="round-info"></div>
+    </div>
+
+    <!-- ═══ LOBBY VIEW ═══ -->
+    <div id="view-lobby">
+      <div class="center">
+        <p class="section-title">Case File Number</p>
+        <div class="room-code glow-pulse" id="room-code">----</div>
+        <p class="text-muted" style="font-style:italic; margin-top:0.5rem;">
+          Players — go to this site on your phone and enter this code
+        </p>
+        <p class="mono text-gold mt-1" id="site-url" style="font-size:1.1rem;"></p>
+      </div>
+
+      <hr class="divider">
+
+      <p class="section-title">Suspects in the Room — <span id="player-count">0</span></p>
+      <ul class="player-list" id="player-list"></ul>
+
+      <div class="center mt-4">
+        <button class="btn btn-large btn-green" id="btn-start" onclick="startGame()" disabled>
+          Begin Investigation
+        </button>
+        <p class="text-muted text-sm mt-1" id="start-hint">Need at least 3 suspects to begin</p>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Custom Prompt Section -->
+      <div class="card" style="max-width:600px; margin:0 auto;">
+        <p class="section-title" style="border:none; padding:0; margin-bottom:0.75rem;">Add Custom Prompts (Optional)</p>
+        <div style="margin-bottom:0.75rem;">
+          <label>Normal Player Prompt</label>
+          <input type="text" id="custom-normal" placeholder="e.g. What's your favorite restaurant?">
+        </div>
+        <div style="margin-bottom:0.75rem;">
+          <label>Secret Unc Prompt</label>
+          <input type="text" id="custom-unc" placeholder="e.g. What's your grandpa's favorite restaurant?">
+        </div>
+        <button class="btn" onclick="addCustomPrompt()">Add Prompt</button>
+        <span class="text-muted text-sm" id="custom-count" style="margin-left:1rem;"></span>
+      </div>
+    </div>
+
+    <!-- ═══ ROUND VIEW ═══ -->
+    <div id="view-round" class="hidden">
+      <div class="center mb-2">
+        <p class="section-title">The Question</p>
+        <div class="prompt-display" id="round-prompt"></div>
+      </div>
+
+      <div class="center">
+        <p class="mono text-muted" id="answer-status">
+          Waiting for testimonies<span class="waiting-dots"></span>
+        </p>
+      </div>
+    </div>
+
+    <!-- ═══ ANSWERS VIEW ═══ -->
+    <div id="view-answers" class="hidden">
+      <div class="center mb-2">
+        <p class="section-title">The Question</p>
+        <div class="prompt-display" id="answers-prompt"></div>
+      </div>
+
+      <p class="section-title">Testimonies</p>
+      <div id="answers-list"></div>
+
+      <div class="center mt-3">
+        <p class="text-muted text-sm mb-1" style="font-style:italic;">
+          Discuss amongst yourselves. Who seems suspicious?
+        </p>
+        <button class="btn btn-crimson btn-large" onclick="startVoting()">
+          File Accusations
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ VOTING VIEW ═══ -->
+    <div id="view-voting" class="hidden">
+      <div class="center">
+        <h2 style="color:var(--crimson-light); margin-bottom:0.5rem;">Accusation Phase</h2>
+        <p class="text-muted" style="font-style:italic;">
+          Players — vote on your phones now
+        </p>
+        <p class="mono mt-2" id="vote-status">
+          Votes: <span id="vote-count">0</span> / <span id="vote-total">0</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- ═══ RESULTS VIEW ═══ -->
+    <div id="view-results" class="hidden">
+      <div class="center animate-in" id="results-content"></div>
+
+      <hr class="divider">
+
+      <div class="flex" style="gap:2rem; flex-wrap:wrap;">
+        <!-- Vote Breakdown -->
+        <div style="flex:1; min-width:280px;">
+          <p class="section-title">Vote Breakdown</p>
+          <div id="vote-breakdown"></div>
+        </div>
+
+        <!-- Scoreboard -->
+        <div style="flex:1; min-width:280px;">
+          <p class="section-title">Suspect Status</p>
+          <table class="scoreboard" id="scoreboard">
+            <thead>
+              <tr><th>Alias</th><th>Status</th><th>Correct Accusations</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="center mt-4" id="results-actions"></div>
+    </div>
+
+    <!-- ═══ GAME OVER VIEW ═══ -->
+    <div id="view-gameover" class="hidden">
+      <div class="game-over-banner animate-in" id="gameover-content"></div>
+
+      <hr class="divider">
+
+      <div style="max-width:500px; margin:0 auto;">
+        <p class="section-title">Final Suspect Board</p>
+        <table class="scoreboard" id="final-scoreboard">
+          <thead>
+            <tr><th>Alias</th><th>Role</th><th>Status</th><th>Correct Votes</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="center mt-4">
+        <button class="btn btn-large" onclick="returnToLobby()">New Investigation</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/host.js"></script>
+</body>
+</html>

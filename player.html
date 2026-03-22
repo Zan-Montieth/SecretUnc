@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Secret Unc — Agent</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="smoke-bg"></div>
+
+  <div class="phone-view">
+    <!-- ═══ CONNECTING VIEW ═══ -->
+    <div id="view-connecting" class="phone-content center">
+      <div style="padding-top:3rem;">
+        <h2 style="color:var(--gold);">Joining Investigation</h2>
+        <p class="mono text-muted mt-2">Connecting<span class="waiting-dots"></span></p>
+        <p id="connect-error" class="text-crimson mt-2" style="display:none;"></p>
+        <button id="btn-retry" class="btn mt-2" onclick="window.location.href='/'" style="display:none;">
+          Go Back
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ LOBBY VIEW ═══ -->
+    <div id="view-lobby" class="hidden">
+      <div class="phone-header">
+        <h2>Secret Unc</h2>
+      </div>
+      <div class="phone-content center">
+        <div class="card gold-border">
+          <p class="mono text-sm text-muted">You are connected as</p>
+          <p class="mono" style="font-size:1.5rem; color:var(--gold); margin:0.5rem 0;" id="my-name"></p>
+          <p class="text-sm text-muted" style="font-style:italic;">
+            Waiting for the host to begin the investigation...
+          </p>
+          <div class="mt-2">
+            <span class="status-badge active">In Lobby</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ROLE REVEAL VIEW ═══ -->
+    <div id="view-role" class="hidden">
+      <div class="phone-content center">
+        <div class="role-reveal animate-in" id="role-content"></div>
+        <p class="text-sm text-muted mt-2" style="font-style:italic;">
+          Don't show this to anyone!
+        </p>
+      </div>
+    </div>
+
+    <!-- ═══ PROMPT/ANSWER VIEW ═══ -->
+    <div id="view-prompt" class="hidden">
+      <div class="phone-header">
+        <span class="mono text-sm text-muted" id="prompt-round-info"></span>
+      </div>
+      <div class="phone-content">
+        <div class="prompt-display" id="my-prompt" style="font-size:1.1rem;"></div>
+        <div class="mt-2">
+          <label>Your Testimony</label>
+          <textarea id="input-answer" rows="3" placeholder="Type your answer..." maxlength="200"></textarea>
+          <p class="text-sm text-muted mt-1"><span id="char-count">0</span>/200</p>
+        </div>
+        <button class="btn btn-large" id="btn-submit-answer" onclick="submitAnswer()" style="width:100%;">
+          Submit Testimony
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ WAITING FOR OTHERS VIEW ═══ -->
+    <div id="view-waiting" class="hidden">
+      <div class="phone-content center">
+        <div class="card">
+          <p class="mono">Testimony submitted</p>
+          <p class="text-sm text-muted mt-1" style="font-style:italic;">
+            Waiting for other suspects<span class="waiting-dots"></span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ LOOK AT SCREEN VIEW ═══ -->
+    <div id="view-look" class="hidden">
+      <div class="phone-content center">
+        <div class="card gold-border" style="padding:2rem;">
+          <p style="font-size:2.5rem; margin-bottom:0.5rem;">👁️</p>
+          <h3 style="color:var(--gold); font-size:1rem;">Look at the Screen</h3>
+          <p class="text-sm text-muted mt-1" style="font-style:italic;">
+            All testimonies are being revealed. Discuss who seems suspicious...
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ VOTING VIEW ═══ -->
+    <div id="view-vote" class="hidden">
+      <div class="phone-header">
+        <h2 style="color:var(--crimson-light); font-size:1rem;">File Your Accusation</h2>
+        <p class="text-sm text-muted" style="font-style:italic;">Who is the Secret Unc?</p>
+      </div>
+      <div class="phone-content" id="vote-buttons"></div>
+      <div class="phone-footer">
+        <button class="btn btn-crimson btn-large" id="btn-submit-vote" onclick="submitVote()"
+                style="width:100%;" disabled>
+          Confirm Accusation
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ VOTE SUBMITTED VIEW ═══ -->
+    <div id="view-vote-waiting" class="hidden">
+      <div class="phone-content center">
+        <div class="card">
+          <p class="mono">Accusation filed</p>
+          <p class="text-sm text-muted mt-1" style="font-style:italic;">
+            Waiting for all votes<span class="waiting-dots"></span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ROUND RESULTS VIEW ═══ -->
+    <div id="view-results" class="hidden">
+      <div class="phone-content center">
+        <div id="player-result-content" class="animate-in"></div>
+      </div>
+    </div>
+
+    <!-- ═══ SPECTATING VIEW ═══ -->
+    <div id="view-spectate" class="hidden">
+      <div class="phone-content center">
+        <div class="card" style="border-color:var(--crimson);">
+          <p style="font-size:2rem; margin-bottom:0.5rem;">💀</p>
+          <h3 style="color:var(--crimson-light); font-size:0.9rem;">You've Been Exposed</h3>
+          <p class="text-sm text-muted mt-1" style="font-style:italic;">
+            Watch the investigation unfold on the big screen.
+          </p>
+          <p class="mono text-sm mt-2" id="spectate-round"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ GAME OVER VIEW ═══ -->
+    <div id="view-gameover" class="hidden">
+      <div class="phone-content center">
+        <div id="player-gameover-content" class="animate-in"></div>
+        <p class="text-sm text-muted mt-2" style="font-style:italic;">
+          Look at the big screen for final results
+        </p>
+      </div>
+    </div>
+
+    <!-- ═══ DISCONNECTED VIEW ═══ -->
+    <div id="view-disconnected" class="hidden">
+      <div class="phone-content center">
+        <div class="card" style="border-color:var(--crimson); padding:2rem;">
+          <p style="font-size:2rem; margin-bottom:0.5rem;">🔌</p>
+          <h3 style="color:var(--crimson-light); font-size:0.9rem;">Case Closed</h3>
+          <p class="text-sm text-muted mt-1">The host ended the investigation.</p>
+          <a href="/" class="btn mt-2">Return to Lobby</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/player.js"></script>
+</body>
+</html>
