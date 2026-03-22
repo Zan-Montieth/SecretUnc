@@ -11,7 +11,7 @@ const io = new Server(server, {
   pingInterval: 25000
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '.')));
 
 // ─── PROMPT PAIRS ────────────────────────────────────────────────
 const DEFAULT_PROMPTS = [
