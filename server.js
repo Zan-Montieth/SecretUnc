@@ -165,12 +165,19 @@ io.on('connection', (socket) => {
     callback({ success: true, playerCount: room.players.length });
   });
 
-  // ── HOST: Add Custom Prompt ──
-  socket.on('add-custom-prompt', ({ normal, unc }) => {
+  // ── HOST: End Game Early ──
+  socket.on('end-game', () => {
     const room = rooms.get(socket.roomCode);
     if (!room || socket.id !== room.hostId) return;
-    room.customPrompts.push({ normal, unc });
-    socket.emit('custom-prompt-added', { count: room.customPrompts.length });
+
+    room.state = 'GAME_OVER';
+    room.players.forEach(p => { p.roleRevealed = true; });
+
+    const result = { winner: 'none', reason: 'The host ended the game early.' };
+    socket.emit('game-ended', { result, players: getPlayerList(room) });
+    room.players.forEach(p => {
+      io.to(p.id).emit('round-results-player', { eliminatedName: '', eliminatedRole: '', wasMe: false, gameOver: result });
+    });
   });
 
   // ── HOST: Start Game ──

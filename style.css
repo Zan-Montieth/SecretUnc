@@ -386,6 +386,23 @@ label {
   animation: pulse 2s ease infinite;
 }
 
+/* ── Answer Progress Bar ── */
+.answer-progress-track {
+  height: 36px;
+  background: var(--bg-surface);
+  border: 1px solid rgba(201,162,39,0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.answer-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
 /* ── Prompt Display ── */
 .prompt-display {
   font-family: var(--font-body);
@@ -667,14 +684,3 @@ label {
 .text-green { color: var(--green-light); }
 .text-muted { color: var(--text-secondary); }
 .text-sm { font-size: 0.85rem; }
-
-/* ── Smoke BG element ── */
-.smoke-bg {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse at 20% 80%, rgba(201,162,39,0.03) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(139,32,32,0.03) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(19,19,32,0.8) 0%, var(--bg-deep) 70%);
-}

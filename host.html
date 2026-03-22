@@ -10,13 +10,13 @@
   </style>
 </head>
 <body>
-  <div class="smoke-bg"></div>
 
   <div class="host-screen">
     <!-- HEADER -->
     <div class="header-bar">
       <div class="logo">Secret Unc</div>
       <div class="round-info" id="round-info"></div>
+      <button id="btn-end-game" class="btn btn-crimson" onclick="endGame()" style="display:none; margin-left:auto;">End Game</button>
     </div>
 
     <!-- ═══ LOBBY VIEW ═══ -->
@@ -42,35 +42,22 @@
         <p class="text-muted text-sm mt-1" id="start-hint">Need at least 3 suspects to begin</p>
       </div>
 
-      <hr class="divider">
-
-      <!-- Custom Prompt Section -->
-      <div class="card" style="max-width:600px; margin:0 auto;">
-        <p class="section-title" style="border:none; padding:0; margin-bottom:0.75rem;">Add Custom Prompts (Optional)</p>
-        <div style="margin-bottom:0.75rem;">
-          <label>Normal Player Prompt</label>
-          <input type="text" id="custom-normal" placeholder="e.g. What's your favorite restaurant?">
-        </div>
-        <div style="margin-bottom:0.75rem;">
-          <label>Secret Unc Prompt</label>
-          <input type="text" id="custom-unc" placeholder="e.g. What's your grandpa's favorite restaurant?">
-        </div>
-        <button class="btn" onclick="addCustomPrompt()">Add Prompt</button>
-        <span class="text-muted text-sm" id="custom-count" style="margin-left:1rem;"></span>
-      </div>
     </div>
 
     <!-- ═══ ROUND VIEW ═══ -->
     <div id="view-round" class="hidden">
       <div class="center mb-2">
-        <p class="section-title">The Question</p>
-        <div class="prompt-display" id="round-prompt"></div>
+        <p class="section-title">Testimonies In Progress</p>
+        <p class="text-muted" style="font-style:italic; margin-bottom:1.5rem;">
+          Suspects are answering on their phones&hellip;
+        </p>
       </div>
 
-      <div class="center">
-        <p class="mono text-muted" id="answer-status">
-          Waiting for testimonies<span class="waiting-dots"></span>
-        </p>
+      <div style="max-width:500px; margin:0 auto;">
+        <div class="answer-progress-track">
+          <div class="answer-progress-fill" id="answer-progress-fill"></div>
+        </div>
+        <p class="mono text-muted mt-1 center" id="answer-status">0 / 0</p>
       </div>
     </div>
 

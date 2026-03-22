@@ -79,23 +79,27 @@ function startGame() {
 socket.on('game-started', ({ totalRounds, playerCount, uncCount, players }) => {
   document.getElementById('round-info').textContent =
     `${playerCount} Suspects · ${uncCount} Secret Unc${uncCount > 1 ? 's' : ''} · ${totalRounds} Rounds`;
+  document.getElementById('btn-end-game').style.display = '';
   // Stay on lobby briefly, then first round will start via round-started
 });
 
 // ─── ROUND EVENTS ────────────────────────────────────────────────
-socket.on('round-started', ({ round, maxRounds, normalPrompt, aliveCount, players }) => {
+socket.on('round-started', ({ round, maxRounds, aliveCount }) => {
   showView('view-round');
   document.getElementById('round-info').innerHTML =
     `Round <strong style="color:var(--gold)">${round}</strong> of ${maxRounds}`;
-  document.getElementById('round-prompt').textContent = normalPrompt;
-  document.getElementById('answer-status').innerHTML =
-    `Waiting for testimonies<span class="waiting-dots"></span> (0 / ${aliveCount})`;
+  updateAnswerProgress(0, aliveCount);
 });
 
 socket.on('answer-count', ({ count, total }) => {
-  document.getElementById('answer-status').innerHTML =
-    `Waiting for testimonies<span class="waiting-dots"></span> (${count} / ${total})`;
+  updateAnswerProgress(count, total);
 });
+
+function updateAnswerProgress(count, total) {
+  const pct = total > 0 ? (count / total) * 100 : 0;
+  document.getElementById('answer-progress-fill').style.width = pct + '%';
+  document.getElementById('answer-status').textContent = `${count} / ${total}`;
+}
 
 // ─── ANSWERS REVEALED ────────────────────────────────────────────
 socket.on('all-answers', ({ answers, prompt, round }) => {
@@ -192,14 +196,15 @@ function showGameOver(result, players, lastEliminated) {
 
   const content = document.getElementById('gameover-content');
   const isPlayersWin = result.winner === 'players';
+  const isEarlyEnd = result.winner === 'none';
 
   content.innerHTML = `
-    <div style="font-size:4rem; margin-bottom:1rem;">${isPlayersWin ? '🏆' : '🕶️'}</div>
-    <h1>${isPlayersWin ? 'Case Closed' : 'Case Gone Cold'}</h1>
+    <div style="font-size:4rem; margin-bottom:1rem;">${isEarlyEnd ? '🛑' : isPlayersWin ? '🏆' : '🕶️'}</div>
+    <h1>${isEarlyEnd ? 'Investigation Closed' : isPlayersWin ? 'Case Closed' : 'Case Gone Cold'}</h1>
     <p class="subtitle">${escapeHtml(result.reason)}</p>
-    <p class="mono mt-2" style="color:${isPlayersWin ? 'var(--green-light)' : 'var(--crimson-light)'}; font-size:1.2rem;">
+    ${!isEarlyEnd ? `<p class="mono mt-2" style="color:${isPlayersWin ? 'var(--green-light)' : 'var(--crimson-light)'}; font-size:1.2rem;">
       ${isPlayersWin ? 'The investigators win!' : 'The Secret Uncs win!'}
-    </p>
+    </p>` : ''}
   `;
 
   // Final scoreboard with all roles revealed
@@ -242,26 +247,22 @@ function returnToLobby() {
 socket.on('returned-to-lobby', ({ players }) => {
   showView('view-lobby');
   document.getElementById('round-info').textContent = '';
+  document.getElementById('btn-end-game').style.display = 'none';
   const btn = document.getElementById('btn-start');
   btn.disabled = false;
   btn.textContent = 'Begin Investigation';
   renderPlayerList(players);
 });
 
-// ─── CUSTOM PROMPTS ──────────────────────────────────────────────
-function addCustomPrompt() {
-  const normal = document.getElementById('custom-normal').value.trim();
-  const unc = document.getElementById('custom-unc').value.trim();
-
-  if (!normal || !unc) return;
-
-  socket.emit('add-custom-prompt', { normal, unc });
-  document.getElementById('custom-normal').value = '';
-  document.getElementById('custom-unc').value = '';
+// ─── END GAME ────────────────────────────────────────────────────
+function endGame() {
+  if (!confirm('End the game early?')) return;
+  socket.emit('end-game');
 }
 
-socket.on('custom-prompt-added', ({ count }) => {
-  document.getElementById('custom-count').textContent = `${count} custom prompt${count > 1 ? 's' : ''} added`;
+socket.on('game-ended', ({ result, players }) => {
+  document.getElementById('btn-end-game').style.display = 'none';
+  showGameOver(result, players, null);
 });
 
 // ─── UTILS ───────────────────────────────────────────────────────
